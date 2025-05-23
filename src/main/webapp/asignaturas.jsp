@@ -1,9 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="com.google.gson.Gson" %>
-<%@ page import="com.google.gson.reflect.TypeToken" %>
-<%@ page import="java.lang.reflect.Type" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,8 +10,7 @@
     <title>Asignaturas NOL_G15</title>
 </head>
 <body>
-    <div class="container mt-4">
-        <!-- Header con información del alumno -->
+    <!-- Header con información del alumno -->
         <div class="header mb-4">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="text-primary">
@@ -34,116 +29,74 @@
                 </div>
             </div>
         </div>
-
+        
         <!-- Grid de asignaturas -->
         <div class="asignaturas-grid row">
-            <%
-                // Obtener los datos del servlet
-                String asignaturasJson = (String) request.getAttribute("asignaturasData");
-                String nombreAlumno = (String) request.getAttribute("nombreAlumno");
-                String dniAlumno = (String) request.getAttribute("dniAlumno");
-                
-                if (asignaturasJson != null && !asignaturasJson.isEmpty()) {
-                    // Parsear el JSON usando Gson
-                    Gson gson = new Gson();
-                    Type listType = new TypeToken<List<Map<String, Object>>>(){}.getType();
-                    List<Map<String, Object>> asignaturas = gson.fromJson(asignaturasJson, listType);
-                    
-                    if (asignaturas != null && !asignaturas.isEmpty()) {
-                        // Iterar sobre las asignaturas
-                        for (Map<String, Object> asignatura : asignaturas) {
-                            String codigo = (String) asignatura.get("codigo");
-                            String nombre = (String) asignatura.get("nombre");
-                            String grupoNombre = (String) asignatura.get("grupoNombre");
-                            List<String> miembros = (List<String>) asignatura.get("miembros");
-                            Double creditos = (Double) asignatura.get("creditos");
-                            Integer curso = asignatura.get("curso") instanceof Double ? 
-                                ((Double) asignatura.get("curso")).intValue() : (Integer) asignatura.get("curso");
-                            String cuatrimestre = (String) asignatura.get("cuatrimestre");
-            %>
-                        <!-- Card de Asignatura -->
+            <c:choose>
+                <c:when test="${not empty asignaturasData}">
+                    <c:forEach items="${asignaturasData}" var="asignatura">
                         <div class="col-md-4 mb-4">
                             <div class="card asignatura-card h-100 shadow-sm">
                                 <div class="card-header bg-primary text-white">
                                     <h5 class="card-title mb-0">
-                                        <i class="bi bi-book"></i> <%= nombre %>
+                                        <i class="bi bi-book"></i> ${asignatura.nombre}
                                     </h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
                                         <p class="card-text">
-                                            <strong>Código:</strong> <%= codigo %><br>
-                                            <strong>Curso:</strong> <%= curso %>º<br>
-                                            <strong>Cuatrimestre:</strong> <%= cuatrimestre %><br>
-                                            <strong>Créditos:</strong> <%= creditos %>
+                                            <strong>Código:</strong> ${asignatura.codigo}<br>
+                                            <strong>Curso:</strong> ${asignatura.curso}º<br>
+                                            <strong>Cuatrimestre:</strong> ${asignatura.cuatrimestre}<br>
+                                            <strong>Créditos:</strong> ${asignatura.creditos}
                                         </p>
                                     </div>
                                     
                                     <div class="grupo-info bg-light p-3 rounded">
                                         <h6 class="text-primary">
-                                            <i class="bi bi-people"></i> <%= grupoNombre != null ? grupoNombre : "Grupo" %>
+                                            <i class="bi bi-people"></i> ${asignatura.grupoNombre}
                                         </h6>
                                         <ul class="list-unstyled mb-0">
-                                            <%
-                                                if (miembros != null && !miembros.isEmpty()) {
-                                                    for (String miembro : miembros) {
-                                            %>
+                                            <c:choose>
+                                                <c:when test="${not empty asignatura.miembros}">
+                                                    <c:forEach items="${asignatura.miembros}" var="miembro">
                                                         <li class="mb-1">
-                                                            <i class="bi bi-person-fill text-muted"></i> <%= miembro %>
+                                                            <i class="bi bi-person-fill text-muted"></i> ${miembro}
                                                         </li>
-                                            <%
-                                                    }
-                                                } else {
-                                            %>
+                                                    </c:forEach>
+                                                </c:when>
+                                                <c:otherwise>
                                                     <li class="text-muted">
                                                         <i class="bi bi-exclamation-circle"></i> No hay miembros asignados
                                                     </li>
-                                            <%
-                                                }
-                                            %>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </ul>
                                     </div>
                                 </div>
                                 <div class="card-footer bg-transparent">
-                                    <a href="alumno-detalle?asignatura=<%= codigo %>" 
+                                    <a href="alumno-detalle?asignatura=${asignatura.codigo}" 
                                        class="btn btn-primary w-100">
                                         <i class="bi bi-eye"></i> Ver Calificaciones
                                     </a>
                                 </div>
                             </div>
                         </div>
-            <%
-                        }
-                    } else {
-            %>
-                        <div class="col-12">
-                            <div class="alert alert-warning text-center">
-                                <i class="bi bi-exclamation-triangle"></i>
-                                <h4>No hay asignaturas disponibles</h4>
-                                <p>No se encontraron asignaturas para este alumno.</p>
-                            </div>
-                        </div>
-            <%
-                    }
-                } else {
-            %>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
                     <div class="col-12">
-                        <div class="alert alert-danger text-center">
-                            <i class="bi bi-x-circle"></i>
-                            <h4>Error al cargar las asignaturas</h4>
-                            <p>No se pudieron obtener los datos de las asignaturas.</p>
-                            <a href="<%= request.getContextPath() %>/asignaturas" class="btn btn-primary">
-                                <i class="bi bi-arrow-clockwise"></i> Reintentar
-                            </a>
+                        <div class="alert alert-warning text-center">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <h4>No hay asignaturas disponibles</h4>
+                            <p>No se encontraron asignaturas para este alumno.</p>
                         </div>
                     </div>
-            <%
-                }
-            %>
+                </c:otherwise>
+            </c:choose>
         </div>
-
-        <!-- Footer -->
-        <footer class="bg-light text-center py-3 mt-5 border-top">
+        
+          <footer class="bg-light text-center py-3 mt-5 border-top">
             <div class="container">
                 <p class="mb-0 text-muted">
                     <strong>NOL_G15:</strong> Arnau Vila, Ferran Belloch, Álvaro Gómez, Mario Pérez
@@ -152,7 +105,6 @@
             </div>
         </footer>
     </div>
-
     <!-- Bootstrap JS y dependencias -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Bootstrap Icons -->
