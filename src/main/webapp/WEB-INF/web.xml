@@ -23,4 +23,19 @@
         <error-code>500</error-code>
         <location>/error.jsp</location>
     </error-page>
+    
+<context-param>
+  <param-name>logFilePath</param-name>
+  <param-value>logs/nol-access.log</param-value>
+</context-param>
+
+<filter>
+  <filter-name>Logs</filter-name>
+  <filter-class>nol.Logs</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>Logs</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
+    
 </web-app>
