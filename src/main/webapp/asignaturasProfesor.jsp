@@ -26,19 +26,16 @@
 </head>
 <body>
     <div class="container mt-4">
-        <!-- Header con información del alumno -->
+        <!-- Header con información del profesor -->
         <div class="header mb-4">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="text-primary">
-                    Asignaturas del alumno: 
-                    <span id="nombreAlumno" class="text-secondary">
-                        <c:out value="${nombreAlumno != null ? nombreAlumno : 'Usuario'}" />
+                    Asignaturas del profesor: 
+                    <span id="nombreProfesor" class="text-secondary">
+                        <c:out value="${nombreProfesor != null ? nombreProfesor : 'Profesor'}" />
                     </span>
                 </h1>
                 <div>
-                    <a href="certificado?dni=${dniAlumno}" class="btn btn-success me-2">
-                        <i class="bi bi-file-earmark-pdf"></i> Certificado
-                    </a>
                     <a href="logout" class="btn btn-outline-danger">
                         <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                     </a>
@@ -101,9 +98,13 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="card-footer bg-transparent">
-                                    <a href="alumno-detalle?asignatura=<%= asignatura.get("codigo") %>&dni=${dniAlumno}" 
+                                <div class="card-footer bg-transparent d-flex flex-column gap-2">
+                                    <a href="listaAlumnosAsignatura?acronimo=<%= asignatura.get("codigo") %>" 
                                        class="btn btn-primary w-100">
+                                        <i class="bi bi-people-fill"></i> Ver Alumnos
+                                    </a>
+                                    <a href="alumno-detalle?asignatura=<%= asignatura.get("codigo") %>&dni=${dniProfesor}" 
+                                       class="btn btn-secondary w-100">
                                         <i class="bi bi-eye"></i> Ver Calificaciones
                                     </a>
                                 </div>
@@ -117,7 +118,7 @@
                             <div class="alert alert-warning text-center">
                                 <i class="bi bi-exclamation-triangle"></i>
                                 <h4>No hay asignaturas disponibles</h4>
-                                <p>No se encontraron asignaturas para este alumno.</p>
+                                <p>No se encontraron asignaturas para este profesor.</p>
                             </div>
                         </div>
             <%
@@ -153,4 +154,4 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> 
+</html>
